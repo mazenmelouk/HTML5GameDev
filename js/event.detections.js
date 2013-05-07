@@ -1,6 +1,6 @@
 function detectPlayerEnemyCollision() {
     for (i = 0; i < enemies.length; i++) {
-        if (detectCollision(Sprites.player, enemies[i].sprite)) {
+        if (enemies[i].state != 'dying' && detectCollision(Sprites.player, enemies[i].sprite)) {
             if (shielded) {
                 shielded = false;
                 stage.removeChild(Sprites.shield);
@@ -65,12 +65,14 @@ function detectGiftLocation() {
             stage.addChild(Texts.counterText);
         }
         else {
-            Textures.bigFatNuke = new PIXI.Texture(PIXI.Texture.fromImage('img/bigFatNuke.png'));
+            Textures.bigFatNuke = new PIXI.Texture(PIXI.Texture.fromImage('img/mario-cloud.png'));
             Sprites.bigFatNuke = new PIXI.Sprite(Textures.bigFatNuke);
             Sprites.bigFatNuke.position = getCenter(currentGift);
             Sprites.bigFatNuke.anchor.x = Sprites.bigFatNuke.anchor.y = 0.5;
             Sprites.bigFatNuke.width = Sprites.bigFatNuke.height = 0;
-            
+
+            playSound('whoosh');
+
             destroyAll = true;
             stage.addChild(Sprites.bigFatNuke);
             stage.swapChildren(Sprites.bigFatNuke, Sprites.player);
@@ -112,61 +114,34 @@ function detectBulletStartButtonCollision() {
         }
     }
 }
-
-function blastAllEnemies()
-{
-    for (j = 0; j < enemies.length; j++)
-    {
-        var enemyBlast = {
-            animIndex: 0,
-            associatedEnemy: enemies[j],
-            deltaXY: getCenter(enemies[j].sprite)
-        };
-
-        enemyBlast.sprite = new PIXI.Sprite(new PIXI.Texture.fromFrame(cacheIndices.explosion1.start));
-        enemyBlast.sprite.anchor.x = enemyBlast.sprite.anchor.y = 0.5;
-        enemyBlast.sprite.position = getCenter(enemies[j].sprite);
-        enemyBlast.sprite.width = enemyBlast.sprite.height = enemies[j].sprite.width / 2.5;
-        
-
-       playSound("blast");
-                enemyBlasts.push(enemyBlast);
-                stage.addChild(enemyBlast.sprite);
-//score += 10 * (currentLevel + 1) * (enemyTypes[enemies[j].type].scoreFactor)
-  //                  * (enemies[j].injuries+1);
-
-              //  if (score>=Level[currentLevel].scoreStep)
-                //    LevelUp();
-             
-               
-
-                enemies[j].injuries++;
-                enemies[j].oscNo = 0;
-                enemies[j].oscDir = 'right';
-                enemies[j].oscPos = 0;
-                 if (enemies[j].injuries < 2) {
-                    switch(enemies[j].type){
-                        case 0:
-                            enemies[j].redMask = new PIXI.Sprite(Textures.enemy1Red);
-                            break;
-                        case 1:
-                            enemies[j].redMask = new PIXI.Sprite(Textures.enemy2Red);
-                            break;
-                    }
-                    
-                    enemies[j].redMask.alpha = 0;
-                    enemies[j].sprite.addChild(enemies[j].redMask);
-                }
-                if (enemies[j].injuries >= enemyTypes[enemies[j].type].maxInjuries)
-                    enemies[j].state = 'dying';
-                else {
-                    enemies[j].state = 'hurting';
-
-                }
-
-    }
-
-}
+/*
+ function blastAllEnemies()
+ {
+ for (j = 0; j < enemies.length; j++)
+ {
+ var enemyBlast = {
+ animIndex: 0
+ };
+ 
+ enemyBlast.sprite = new PIXI.Sprite(new PIXI.Texture.fromFrame(cacheIndices.explosion1.start));
+ enemyBlast.sprite.anchor.x = enemyBlast.sprite.anchor.y = 0.5;
+ enemyBlast.sprite.position = getCenter(enemies[j].sprite);
+ enemyBlast.sprite.width = enemyBlast.sprite.height = enemies[j].sprite.width / 2.5;
+ score += 10;
+ 
+ playSound("blast");
+ enemyBlasts.push(enemyBlast);
+ stage.addChild(enemyBlast.sprite);
+ 
+ enemies[j].injuries++;
+ enemies[j].oscNo = 0;
+ enemies[j].oscDir = 'right';
+ enemies[j].oscPos = 0;
+ enemies[j].state = 'dying';
+ 
+ }
+ 
+ }*/
 function detectBulletEnemyCollision(bulletsArray) {
     var i, j;
     for (j = 0; j < enemies.length; j++)
@@ -186,11 +161,11 @@ function detectBulletEnemyCollision(bulletsArray) {
                 enemyBlast.sprite.width = enemyBlast.sprite.height = enemies[j].sprite.width / 2.5;
 
                 score += 10 * (currentLevel + 1) * (enemyTypes[enemies[j].type].scoreFactor)
-                    * (enemies[j].injuries+1);
+                        * (enemies[j].injuries + 1);
 
-                if (score>=Level[currentLevel].scoreStep)
+                if (score >= Level[currentLevel].scoreStep)
                     LevelUp();
-                
+
                 playSound("blast");
                 enemyBlasts.push(enemyBlast);
                 stage.addChild(enemyBlast.sprite);
@@ -202,26 +177,14 @@ function detectBulletEnemyCollision(bulletsArray) {
                 enemies[j].oscNo = 0;
                 enemies[j].oscDir = 'right';
                 enemies[j].oscPos = 0;
-                if (enemies[j].injuries < 2) {
-                    switch(enemies[j].type){
-                        case 0:
-                            enemies[j].redMask = new PIXI.Sprite(Textures.enemy1Red);
-                            break;
-                        case 1:
-                            enemies[j].redMask = new PIXI.Sprite(Textures.enemy2Red);
-                            break;
-                    }
-                    
-                    enemies[j].redMask.alpha = 0;
-                    enemies[j].sprite.addChild(enemies[j].redMask);
-                }
+
                 if (enemies[j].injuries >= enemyTypes[enemies[j].type].maxInjuries)
                     enemies[j].state = 'dying';
                 else {
                     enemies[j].state = 'hurting';
 
                 }
-                if ( (score - prevScore)>=Level[currentLevel].bonusStep && sendGift) {
+                if ((score - prevScore) >= Level[currentLevel].bonusStep && sendGift) {
                     giftIsActive = true;
                     sendGift = false;
                     spawnPowers();
@@ -234,15 +197,21 @@ function detectBulletEnemyCollision(bulletsArray) {
         }
 }
 
-function detectDestroyAllCollisions(){
-    for(var i=0; i<enemies.length; i++){
-        if(Math.pow(getTopLeft(enemies[i].sprite).x - getCenter(Sprites.bigFatNuke).x,2)
-            + Math.pow(getTopLeft(enemies[i].sprite).y - getCenter(Sprites.bigFatNuke).y),2
-            <= Math.pow(Sprites.bigFatNuke.width,2)
-            ||
-        Math.pow(getBottomRight(enemies[i].sprite).x - getCenter(Sprites.bigFatNuke).x,2)
-            + Math.pow(getBottomRight(enemies[i].sprite).y - getCenter(Sprites.bigFatNuke).y),2
-            <= Math.pow(Sprites.bigFatNuke.width,2))
+function detectDestroyAllCollisions() {
+    if (!destroyAll)
+        return;
+    for (var i = 0; i < enemies.length; i++) {
+        if (Math.pow(getCenter(enemies[i].sprite).x - getCenter(Sprites.bigFatNuke).x, 2)
+                + Math.pow(getCenter(enemies[i].sprite).y - getCenter(Sprites.bigFatNuke).y, 2)
+                <= Math.pow(Sprites.bigFatNuke.width * 0.6, 2)&& enemies[i].state!='dying') {
             enemies[i].state = 'dying';
+            enemies[i].oscNo = 0;
+            enemies[i].oscDir = 'right';
+            enemies[i].oscPos = 0;
+            score += 10;
+
+            if (score >= Level[currentLevel].scoreStep)
+              LevelUp();
+        }
     }
 }

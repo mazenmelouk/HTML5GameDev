@@ -31,15 +31,19 @@ function initTextures() {
     Textures.playerBlast = PIXI.Texture.fromImage("specialBlast.png");
     Textures.soundOn = PIXI.Texture.fromImage('img/sound-on.png');
     Textures.soundOff = PIXI.Texture.fromImage('img/sound-off.png');
-    
+
+    Textures.planets = new Array();
+    for (var i = 0; i < 3; i++)
+        Textures.planets.push(PIXI.Texture.fromImage('img/planet' + i + '.png'));
+
     Textures.startButton = new PIXI.Texture(PIXI.Texture.fromImage('img/wide-button.png'),
             new PIXI.Rectangle(0, 0, 256, 64));
     Textures.startButton.noFrame = false;
-    
-     Textures.resumeButton = new PIXI.Texture(PIXI.Texture.fromImage('img/wide-button.png'),
+
+    Textures.resumeButton = new PIXI.Texture(PIXI.Texture.fromImage('img/wide-button.png'),
             new PIXI.Rectangle(0, 0, 256, 64));
     Textures.resumeButton.noFrame = false;
-    
+
     for (var i = 0; i < cacheIndices.explosion1.length; i++)
         new PIXI.Texture.addTextureToCache(PIXI.Texture.fromImage('img/explosion1/' + i + '.png'),
                 cacheIndices.explosion1.start + i);
@@ -49,11 +53,11 @@ function initTextures() {
                 cacheIndices.fireball.start + i);
 }
 
-function reInitTextures(){
+function reInitTextures() {
     Textures.startButton = new PIXI.Texture(PIXI.Texture.fromImage('img/wide-button.png'),
             new PIXI.Rectangle(0, 0, 256, 64));
     Textures.startButton.noFrame = false;
-    
+
     Textures.resumeButton = new PIXI.Texture(PIXI.Texture.fromImage('img/wide-button.png'),
             new PIXI.Rectangle(0, 0, 256, 64));
     Textures.resumeButton.noFrame = false;
@@ -102,8 +106,8 @@ function initSprites() {
     Sprites.startButton.width = 256;
     Sprites.startButton.height = 64;
     Sprites.startButton.interactive = true;
-    Sprites.startButton.click = startGame; 
-    
+    Sprites.startButton.click = startGame;
+
     Sprites.resumeButton = new PIXI.Sprite(Textures.resumeButton);
     Sprites.resumeButton.anchor.x = 0.5;
     Sprites.resumeButton.anchor.y = 0.5;
@@ -116,38 +120,50 @@ function initSprites() {
     Sprites.resumeButton.interactive = true;
     Sprites.resumeButton.mousedown = buttonMouseDown;
     Sprites.resumeButton.mouseup = buttonMouseUp;
-    
+
     Sprites.sound = new PIXI.Sprite(Textures.soundOn);
     Sprites.sound.click = muteUnmute;
     Sprites.sound.interactive = true;
     Sprites.sound.anchor.x = Sprites.sound.anchor.y = 0.5;
-    Sprites.sound.position.x = $('body').width()*0.97;
+    Sprites.sound.position.x = $('body').width() * 0.97;
     Sprites.sound.position.y = 20;
+
+    Sprites.planets = new Array();
+    for (var i = 0; i < Textures.planets.length; i++) {
+        var planet = new PIXI.Sprite(Textures.planets[i]);
+        planet.anchor.x = planet.anchor.y = 0.5;
+        planet.position.x = Math.round(Math.random() * $('body').width() * 0.8) +
+                $('body').width() * 0.1;
+        planet.position.y = Math.round(Math.random() * $('body').height() * 0.8) +
+                $('body').height() * 0.1;
+        planet.alpha = 0.5;
+        Sprites.planets.push(planet);
+    }
 }
 
-function reInitSprites(){
+function reInitSprites() {
     Sprites.player.position.x = $('body').width() / 2;
     Sprites.player.position.y = $('body').height() / 1.6;
-    
+
     Sprites.startButton.position.x = $('body').width() / 2;
     Sprites.startButton.position.y = $('body').height() / 2.15;
     Sprites.startButton.alpha = 1;
     Sprites.startButton.rotation = 0;
-    
+
     Sprites.resumeButton.position.x = $('body').width() / 2;
     Sprites.resumeButton.position.y = -100;
-    
+
     Sprites.playerBlast.alpha = 1;
     Sprites.playerBlast.width = Sprites.player.width;
     Sprites.playerBlast.height = Sprites.player.height;
 }
 
-function reInitTexts(){
+function reInitTexts() {
     Texts.start.position.x = $('body').width() / 2;
     Texts.start.position.y = $('body').height() / 2.13;
     Texts.start.alpha = 1;
     Texts.start.rotation = 0;
-    
+
     Texts.welcome.position.x = $("body").width() / 2;
     Texts.welcome.position.y = 100;
 }
@@ -157,10 +173,10 @@ function initTexts() {
     Texts.scoreText.anchor.x = 0.5;
     Texts.scoreText.position.x = 120;
     Texts.scoreText.position.y = 10;
-    
-    Texts.counterText=new PIXI.Text("Multi-Ammo: "+bonuslimit,"25px Snippet", "white");
+
+    Texts.counterText = new PIXI.Text("Multi-Bullets: " + bonuslimit, "25px Snippet", "white");
     Texts.counterText.anchor.x = 0.5;
-    Texts.counterText.position.x = 90;
+    Texts.counterText.position.x = 120;
     Texts.counterText.position.y = 50;
 
     Texts.pauseText = new PIXI.Text("Paused", "bold 80px Podkova", "red");
@@ -170,22 +186,30 @@ function initTexts() {
     Texts.welcome.anchor.x = 0.5;
     Texts.welcome.position.x = $("body").width() / 2;
     Texts.welcome.position.y = 100;
-    
+
     Texts.start = new PIXI.Sprite(PIXI.Texture.fromImage('img/start-text.png'));
     Texts.start.anchor.x = Texts.start.anchor.y = 0.5;
     Texts.start.position.x = $('body').width() / 2;
     Texts.start.position.y = $('body').height() / 2.13;
+    
+    Texts.resume = new PIXI.Sprite(PIXI.Texture.fromImage('img/resume-text.png'));
+    Texts.resume.anchor.x = Texts.resume.anchor.y = 0.5;
+    Texts.resume.position.x = $('body').width() / 2;
+    Texts.resume.position.y = -50;
 }
 
 function initLevel(level) {
     stage.addChild(Sprites.background);
     stage.addChild(Sprites.background2);
+    for(var i=0; i<Sprites.planets.length; i++)
+        stage.addChild(Sprites.planets[i]);
     stage.addChild(Texts.scoreText);
     stage.addChild(Sprites.blackOverlay);
-    
+
     Sprites.blackOverlay.alpha = 0.5;
     stage.addChild(Texts.pauseText);
     stage.addChild(Sprites.resumeButton);
+    stage.addChild(Texts.resume);
     stage.addChild(Sprites.sound);
 }
 

@@ -48,7 +48,7 @@ function clickFunction() {
         stage.addChild(left);
         bulletsR.push(right);
         bulletsL.push(left);
-        if (bonuslimit < 0)
+        if (bonuslimit == 0)
         {
             multigunned = false;
             stage.removeChild(Texts.counterText);
@@ -110,9 +110,12 @@ function buttonMouseUp() {
 }
 
 function LevelUp() {
-    pauseSound('bg'+(currentLevel+1));
+    pauseSound('bg' + (currentLevel + 1));
     currentLevel++;
-    playSound('bg'+(currentLevel+1));
+    if (currentLevel >= Level.length)
+        closeGame();
+    else
+        playSound('bg' + (currentLevel + 1));
 }
 
 function closeGame() {
@@ -130,13 +133,13 @@ function closeGame() {
     sendGift = true;
     giftType = -1;
     currentLevel = 0;
-    reInitTextures();
-    reInitSprites();
-    reInitTexts();
+    initTextures();
+    initSprites();
+    initTexts();
     initLevel(currentLevel);
-    
-    $('body').css({'cursor':'none'});
-    
+
+    $('body').css({'cursor': 'none'});
+
     initStartScreen();
 }
 

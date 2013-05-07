@@ -25,7 +25,7 @@ var Level = new Array(
             fireballSpeed: 2,
             fireballSpawnInterval: 1000,
             enemySpawnInterval: 1000,
-            scoreStep: 2000,
+            scoreStep: 5000,
             bonusStep: 300
         }
 );

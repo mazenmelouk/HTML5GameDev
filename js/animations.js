@@ -84,7 +84,7 @@ function animateEnemies() {
                                 enemies[i].sprite.position.y += Level[currentLevel].enemy2YSpeed;
                             else {
                                 enemies[i].sprite.position.y += Level[currentLevel].enemy2YSpeed;
-                                enemies[i].sprite.position.x += (-enemyX + playerX) / 100;
+                                enemies[i].sprite.position.x += (-enemyX + playerX) / 150;
                             }
                             break;
                     }
@@ -101,7 +101,7 @@ function animateEnemies() {
                         enemies[i].state = 'alive';
                         continue;
                     }
-                    if(enemies[i].oscNo==0)
+                    if (enemies[i].oscNo == 0)
                         enemies[i].redMask.alpha += 0.125;
                     else
                         enemies[i].redMask.alpha -= 0.125;
@@ -179,6 +179,7 @@ function animatePauseUnpause() {
         Sprites.blackOverlay.alpha += 0.05;
         Texts.pauseText.position.y += 20;
         Sprites.resumeButton.position.y += 20;
+        Texts.resume.position.y +=20;
         if (Sprites.blackOverlay.alpha >= 0.6) {
             pausing = false;
         }
@@ -188,6 +189,7 @@ function animatePauseUnpause() {
         stage.addChild(Sprites.blackOverlay);
         Sprites.blackOverlay.alpha -= 0.01;
         Sprites.resumeButton.position.y -= 4;
+        Texts.resume.position.y -=4;
         Texts.pauseText.position.y -= 4;
         if (Sprites.blackOverlay.alpha <= 0)
             resuming = false;
@@ -212,14 +214,17 @@ function animateGameStart() {
     }
 }
 
-function animateDestroyAll(){
-    if(!destroyAll)
+function animateDestroyAll() {
+    if (!destroyAll)
         return;
-    if(getTopLeft(Sprites.bigFatNuke).x<-$('body').width()*0.2 && getTopLeft(Sprites.bigFatNuke).y<-$('body').height()*0.2
-&& getBottomRight(Sprites.bigFatNuke).x>$('body').width()*1.2 && getBottomRight(Sprites.bigFatNuke).y>$('body').height()*1.2)
+    if (getTopLeft(Sprites.bigFatNuke).x < -$('body').width() * 0.2 && getTopLeft(Sprites.bigFatNuke).y < -$('body').height() * 0.2
+            && getBottomRight(Sprites.bigFatNuke).x > $('body').width() * 1.2 && getBottomRight(Sprites.bigFatNuke).y > $('body').height() * 1.2) {
         destroyAll = false;
-    Sprites.bigFatNuke.width+=10;
-    Sprites.bigFatNuke.height+=10;
+        stage.removeChild(Sprites.bigFatNuke);
+        return;
+    }
+    Sprites.bigFatNuke.width += 13;
+    Sprites.bigFatNuke.height += 13;
 }
 
 function animate() {
@@ -243,34 +248,17 @@ function animate() {
                 detectBulletEnemyCollision(bulletsR);
             }
             if (multigunned) {
-                Texts.counterText.setText("Special Ammo:" + bonuslimit);
+                Texts.counterText.setText("Multi-bullets: " + bonuslimit);
             }
-            
 
             animateEnemies();
             animateBullets();
             animateEnemyBlasts();
             animateFireballs();
             animateDestroyAll();
+            detectDestroyAllCollisions();
             Texts.scoreText.setText("Level " + (currentLevel + 1) + " - Score : " + score);
-/*
-            if (destroyAll)
-            {
-                blastAllEnemies();
-                animateEnemyBlasts();
-                destroyAll = false;
-            }*/
-            if (destroyAll)
-                {
-                    blastAllEnemies();
-                    animateEnemyBlasts();
-                    Sprites.bigFatNuke.alpha-=0.005;
-                    if(Sprites.bigFatNuke.alpha<=0)
-                        {destroyAll = false;
-                    
-                    stage.removeChild(Sprites.bigFatNuke);}
-                
-                }
+
             if (giftIsActive) {
                 currentGift.position.y += 3;
                 detectGiftLocation();
